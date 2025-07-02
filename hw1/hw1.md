@@ -18,7 +18,16 @@
 
 ### Notes on Kali Config:
 
-- configured kali with 
+- used kali linux iso to install VM in Virtualbox
+> https://cdimage.kali.org/kali-2025.2/kali-linux-2025.2-installer-amd64.iso
+
+- settings for kali VM
+    - 8GB of memory
+    - 60GB of storage
+    - 4 cores
+- networking
+        - Adapter 1 : NAT, port forwarding on 2222
+- configured kali os with 
 
 > $ sudo kali-tweaks
 
@@ -31,13 +40,14 @@
 
 and used -y to confirm any updates without confirmation
 - Then used curl to download the script to install all the useful tools we will use in this class
+> $ curl -LO https://web.cecs.pdx.edu/~dmcgrath/courses/netsec/setup.sh
 - uncommented github related lines and filled in my information
-- used the command
+- allow execution of script and run
 > $ chmod +x ./setup.sh
 
-to the allow the script to run and ran it to get the successful output as seen below
+> ./setup.sh
 
-
-7. Include a screenshot of the workstation showing the successful output of the setup.sh script from the Kali configuration page. This should be after a reboot of the VM. Your shell should look something like this:
+7. Include a screenshot of the workstation showing the successful output of the setup.sh script from the Kali configuration page. This should be after a reboot of the VM. 
+- completed install screenshot seen below
 
 ![alt text](image-1.png)
