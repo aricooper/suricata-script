@@ -1,0 +1,7 @@
+alert icmp6 any any -> any any (
+    msg:"CVE-2020-16898 Bad Neighbor - malformed RDNSS option length";
+    lua:rdnss_badlen.lua;
+    classtype:attempted-user;
+    sid:10016898;
+    rev:1;
+)
