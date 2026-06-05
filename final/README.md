@@ -181,7 +181,7 @@ Lua lets us parse that list and validate RDNSS Length precisely.
 
 ---
 
-## 3) My process (what I did)
+## 3) Detection Approach
 
 **RFC reading**  
 RFC 4861 (ND) + RFC 8106 (RDNSS) → constraints: `Length >= 3` and `(Length-1)` even.
@@ -276,19 +276,19 @@ Open **two terminals** on Kali.
 ### Terminal A — capture to PCAP
 ```bash
 # replace eth0 with your host-only interface
-tcpdump -e eth0 -w ra_mix.pcap icmp6 and 'ip6[40]=134'
+tcpdump -i eth0 -w ra_mix.pcap icmp6 and 'ip6[40]=134'
 ```
 
 ### Terminal B — Suricata on the interface
 ```bash
-suricata -e eth0 -S local.rules -l ./logs -k none
+suricata -i eth0 -S local.rules -l ./logs -k none
 # watch alerts live in another shell:
 tail -f ./logs/eve.json | jq 'select(.alert and .alert.signature_id==10016898)'
 ```
 
 ### Terminal C — generate traffic
 ```bash
-./gen_ra_rdnss.py -e eth0 -n 60 --interval 0.25
+./gen_ra_rdnss.py -i eth0 -n 60 --interval 0.25
 ```
 
 Stop tcpdump/Suricata with Ctrl‑C after ~30–60 seconds.
@@ -316,7 +316,7 @@ tshark -r ra_mix.pcap -Y "icmpv6.type==134" -T fields -e frame.number -e ipv6.ad
 apt install -y tcpreplay nping
 
 # Replay the tiny single-packet demo to pad captures
-tcpreplay -e eth0 --pps=10 final.pcap
+tcpreplay -i eth0 --pps=10 final.pcap
 
 # Add general network noise
 nping --icmp -c 20 ff02::e eth0
@@ -356,7 +356,7 @@ sudo systemctl status radvd --no-pager
 
 Verify RAs are present:
 ```bash
-sudo tcpdump -e eth0 -vv icmp6 and 'ip6[40]=134' -c 3
+sudo tcpdump -i eth0 -vv icmp6 and 'ip6[40]=134' -c 3
 ```
 
 ---
@@ -367,14 +367,14 @@ In your working directory (contains `rdnss_badlen.lua` + `local.rules`):
 
 **Terminal A — Suricata (live oe eth0):**
 ```bash
-sudo suricata -e eth0 -S local.rules -l ./logs -k none
+sudo suricata -i eth0 -S local.rules -l ./logs -k none
 # in another terminal you can watch alerts:
 tail -f ./logs/eve.json | jq 'select(.alert and .alert.signature_id==10016898)'
 ```
 
 **Terminal B — capture to PCAP:**
 ```bash
-sudo tcpdump -e eth0 -w ra_mix.pcap icmp6 and 'ip6[40]=134'
+sudo tcpdump -i eth0 -w ra_mix.pcap icmp6 and 'ip6[40]=134'
 ```
 
 > You’ll see lots of *valid* RAs from radvd; no alerts yet (that’s good!).
@@ -388,7 +388,7 @@ Use the provided `final.pcap` (contains malformed RDNSS Length). Send a small bu
 ```bash
 cd ~/cve16898
 while true; do
-  sudo tcpreplay -e eth0 --pps=2 final.pcap
+  sudo tcpreplay -i eth0 --pps=2 final.pcap
   sleep 10
 done
 ```
